@@ -39,4 +39,4 @@ I added lots of tests to make sure everything works:
 - Tested all the new password rules
 - Checked nickname validation edge cases
 - Made sure error messages show up correctly
-- Current test coverage is at 92%
+- Current test coverage is at 89%
