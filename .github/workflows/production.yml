@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.10.12] # Define Python versions here
     services:
       postgres:
         image: postgres:latest
@@ -46,9 +46,9 @@ jobs:
           pip install -r requirements.txt
           
       - name: Run tests with Pytest
-        run: python -m pytest test.py
         env:
-          DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb
+          DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb  # Configure the DATABASE_URL environment variable for tests
+        run: pytest
 
   build-and-push-docker:
     needs: test
@@ -71,8 +71,8 @@ jobs:
         with:
           push: true
           tags: rai6/event_manager:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=registry,ref=rai6/event_manager:cache
+          platforms: linux/amd64,linux/arm64 # Multi-platform support
+          cache-from: type=registry,ref=rai6/wis_club_api:cache
           cache-to: type=inline,mode=max
           
       - name: Scan the Docker image
@@ -80,6 +80,6 @@ jobs:
         with:
           image-ref: 'rai6/event_manager:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '1' # Fail the job if vulnerabilities are found
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
