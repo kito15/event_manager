@@ -47,8 +47,8 @@ jobs:
           
       - name: Run tests with Pytest
         env:
-          DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb  # Configure the DATABASE_URL environment variable for tests
-        run: pytest
+          DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb
+        run: pytest --cov=app --cov-report=term-missing -q
 
   build-and-push-docker:
     needs: test
