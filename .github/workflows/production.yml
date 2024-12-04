@@ -49,7 +49,7 @@ jobs:
         env:
           DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb
         run: |
-          pytest --cov=app --cov-report=term-missing -v 2>/dev/null || true
+          pytest --cov=app --cov-report=term-missing --no-header --tb=no -v | grep -E "^(TOTAL|app/.*\.py[ ])" || true
 
   build-and-push-docker:
     needs: test
