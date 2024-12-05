@@ -2,7 +2,7 @@
 
 ## Closed Issues
 
-### 1. Password Validation Enhancement (Issue #123)
+### 1. Password Validation Enhancement (Issue #3)
 **Status**: Closed
 
 I implemented comprehensive password security requirements to protect user accounts while maintaining usability. The changes include:
@@ -100,6 +100,98 @@ async def test_create_user_duplicate_email(async_client, test_user):
     )
     assert response.status_code == 500
     assert "Email already exists" in response.json().get("detail", "")  # Added error message check
+```
+### 4. User Authentication Security (Issue #7)
+**Problem**: Vulnerable authentication system
+**Status**: Closed
+
+**Implementation**: Enhanced security measures in user model:
+
+```71:97:app/models/user_model.py
+    created_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    verification_token = Column(String, nullable=True)
+    email_verified: Mapped[bool] = Column(Boolean, default=False, nullable=False)
+    hashed_password: Mapped[str] = Column(String(255), nullable=False)
+
+
+    def __repr__(self) -> str:
+        """Provides a readable representation of a user object."""
+        return f"<User {self.nickname}, Role: {self.role.name}>"
+
+    def lock_account(self):
+        self.is_locked = True
+
+    def unlock_account(self):
+        self.is_locked = False
+
+    def verify_email(self):
+        self.email_verified = True
+
+    def has_role(self, role_name: UserRole) -> bool:
+        return self.role == role_name
+
+    def update_professional_status(self, status: bool):
+        """Updates the professional status and logs the update time."""
+        self.is_professional = status
+        self.professional_status_updated_at = func.now()
+```
+
+
+**Tests**:
+
+```6:57:tests/test_security.py
+def test_hash_password():
+    """Test that hashing password returns a bcrypt hashed string."""
+    password = "secure_password"
+    hashed = hash_password(password)
+    assert hashed is not None
+    assert isinstance(hashed, str)
+    assert hashed.startswith('$2b$')
+
+def test_hash_password_with_different_rounds():
+    """Test hashing with different cost factors."""
+    password = "secure_password"
+    rounds = 10
+    hashed_10 = hash_password(password, rounds)
+    rounds = 12
+    hashed_12 = hash_password(password, rounds)
+    assert hashed_10 != hashed_12, "Hashes should differ with different cost factors"
+
+def test_verify_password_correct():
+    """Test verifying the correct password."""
+    password = "secure_password"
+    hashed = hash_password(password)
+    assert verify_password(password, hashed) is True
+
+def test_verify_password_incorrect():
+    """Test verifying the incorrect password."""
+    password = "secure_password"
+    hashed = hash_password(password)
+    wrong_password = "incorrect_password"
+    assert verify_password(wrong_password, hashed) is False
+def test_verify_password_invalid_hash():
+    """Test verifying a password against an invalid hash format."""
+    with pytest.raises(ValueError):
+        verify_password("secure_password", "invalid_hash_format")
+
+@pytest.mark.parametrize("password", [
+    "",
+    " ",
+    "a"*100  # Long password
+])
+def test_hash_password_edge_cases(password):
+    """Test hashing various edge cases."""
+    hashed = hash_password(password)
+    assert isinstance(hashed, str) and hashed.startswith('$2b$'), "Should handle edge cases properly"
+
+def test_verify_password_edge_cases():
+    """Test verifying passwords with edge cases."""
+    password = " "
+    hashed = hash_password(password)
+    assert verify_password(password, hashed) is True
+    assert verify_password("not empty", hashed) is False
+
 ```
 
 ## Docker Image
