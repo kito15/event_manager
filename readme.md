@@ -202,7 +202,7 @@ Working on this project taught me valuable lessons about balancing security with
 
 The async programming model in FastAPI was particularly interesting to work with. Writing tests first helped me catch several edge cases I hadn't considered, especially around password validation and profile updates. Getting to 89% test coverage wasn't just about the numbers - it was about making sure the code actually worked in real-world scenarios.
 
-Setting up the CI/CD pipeline was eye-opening. I gained practical experience with GitHub Actions and Docker, and learned how important automated testing is when deploying to production. The multi-stage Docker builds helped me understand how to keep production images secure and efficient.
+Setting up the CI/CD pipeline was eye-opening. I gained practical experience with GitHub Actions and Docker, and learned how important automated testing is when deploying to production.
 
 ## Test Coverage Report
 ```
